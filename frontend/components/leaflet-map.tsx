@@ -153,6 +153,8 @@ export function LeafletMap({ satellites, positions, selectedId, onSelect, riskZo
     riskCirclesRef.current = []
     for (const zone of riskZones) {
       const color = zone.severity === "high" ? "#ef4444" : zone.severity === "medium" ? "#f59e0b" : "#10b981"
+      const pulseClass = zone.severity === "high" ? "pulse-critical" : zone.severity === "medium" ? "pulse-warning" : "pulse-info"
+      
       const c = L.circle([zone.lat, zone.lng], {
         radius: zone.radius * 25000,
         color,
@@ -161,6 +163,7 @@ export function LeafletMap({ satellites, positions, selectedId, onSelect, riskZo
         weight: 1.5,
         dashArray: "6 4",
         opacity: 0.35,
+        className: pulseClass,
       }).addTo(map)
       riskCirclesRef.current.push(c)
     }

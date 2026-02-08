@@ -1,21 +1,50 @@
 "use client"
 
 import { AlertTriangle, Users, Satellite, MapPin, TrendingUp } from "lucide-react"
+import { AnimatedCounter } from "@/components/celebration-effects"
 
 interface StatCardProps {
   icon: React.ReactNode
-  value: string
+  value: string | number
   label: string
   trend?: string
   variant?: "default" | "warning" | "success" | "danger"
+  animate?: boolean
 }
 
-function StatCard({ icon, value, label, trend, variant = "default" }: StatCardProps) {
+function StatCard({ icon, value, label, trend, variant = "default", animate = false }: StatCardProps) {
   const variantColors = {
     default: "text-primary",
     warning: "text-amber-500",
     success: "text-emerald-500",
     danger: "text-destructive"
+  }
+
+  const renderValue = () => {
+    if (!animate || typeof value === 'string') {
+      return <span className="text-lg font-bold leading-none text-foreground">{value}</span>
+    }
+    
+    // Check if value contains decimals and suffix
+    const numStr = String(value)
+    const hasDecimal = numStr.includes('.')
+    const hasSuffix = numStr.match(/[KMB]$/i)
+    
+    if (hasSuffix) {
+      const numValue = parseFloat(numStr)
+      const suffix = numStr.slice(-1)
+      return (
+        <span className="text-lg font-bold leading-none text-foreground">
+          <AnimatedCounter value={numValue} decimals={hasDecimal ? 1 : 0} suffix={suffix} duration={2000} />
+        </span>
+      )
+    }
+    
+    return (
+      <span className="text-lg font-bold leading-none text-foreground">
+        <AnimatedCounter value={Number(value)} decimals={hasDecimal ? 1 : 0} duration={2000} />
+      </span>
+    )
   }
 
   return (
@@ -25,7 +54,7 @@ function StatCard({ icon, value, label, trend, variant = "default" }: StatCardPr
           {icon}
         </div>
         <div className="flex flex-col">
-          <span className="text-lg font-bold leading-none text-foreground">{value}</span>
+          {renderValue()}
           {trend && (
             <div className="mt-0.5 flex items-center gap-1">
               <TrendingUp className="h-2.5 w-2.5 text-emerald-500" />
@@ -51,15 +80,17 @@ export function StatsOverlay() {
         <div className="grid grid-cols-2 gap-2">
           <StatCard
             icon={<Satellite className="h-3.5 w-3.5" />}
-            value="8"
+            value={8}
             label="Satellites"
             variant="default"
+            animate
           />
           <StatCard
             icon={<AlertTriangle className="h-3.5 w-3.5" />}
-            value="23"
+            value={23}
             label="Active Alerts"
             variant="warning"
+            animate
           />
           <StatCard
             icon={<Users className="h-3.5 w-3.5" />}
@@ -67,12 +98,14 @@ export function StatsOverlay() {
             label="Protected"
             trend="+15%"
             variant="success"
+            animate
           />
           <StatCard
             icon={<MapPin className="h-3.5 w-3.5" />}
-            value="15"
+            value={15}
             label="Regions"
             variant="default"
+            animate
           />
         </div>
 

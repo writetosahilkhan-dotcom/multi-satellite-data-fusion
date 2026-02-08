@@ -10,10 +10,12 @@ import { WorldMap } from "@/components/world-map"
 import { DetailPanel } from "@/components/detail-panel"
 import { Earth3DModal } from "@/components/earth-3d-modal"
 import { DemoPlayer } from "@/components/demo-player"
+import { ConfettiCelebration } from "@/components/celebration-effects"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { memo } from "react"
 import { KERALA_FLOOD_SCENARIO, type ScenarioStep } from "@/lib/demo-scenarios"
+import { playSound } from "@/lib/sound-effects"
 
 export function Dashboard() {
   const {
@@ -32,6 +34,7 @@ export function Dashboard() {
 
   const [show3D, setShow3D] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
   const [riskZones, setRiskZones] = useState<
     { lat: number; lng: number; radius: number; severity: string }[]
   >(DEFAULT_RISK_ZONES)
@@ -39,6 +42,23 @@ export function Dashboard() {
 
   // Handle demo scenario steps
   const handleDemoStep = (step: ScenarioStep) => {
+    // Play appropriate sound
+    if (step.data?.type === 'danger' || step.data?.severity === 'critical') {
+      playSound.critical()
+    } else if (step.data?.type === 'warning' || step.data?.severity === 'medium') {
+      playSound.warning()
+    } else {
+      playSound.info()
+    }
+
+    // Check if this is the final step for celebration
+    if (step.time >= KERALA_FLOOD_SCENARIO.duration - 5) {
+      setTimeout(() => {
+        playSound.celebration()
+        setShowCelebration(true)
+      }, 1000)
+    }
+
     // Show toast notification for each step
     const messageData = step.data?.message || step.title
     const toastVariant = 
@@ -170,11 +190,15 @@ export function Dashboard() {
           scenario={KERALA_FLOOD_SCENARIO}
           onClose={() => {
             setDemoMode(false)
+            setShowCelebration(false)
             setRiskZones(DEFAULT_RISK_ZONES)
           }}
           onStepChange={handleDemoStep}
         />
       )}
+
+      {/* Celebration Effects */}
+      <ConfettiCelebration trigger={showCelebration} duration={4000} />
 
       <Toaster />
     </div>
