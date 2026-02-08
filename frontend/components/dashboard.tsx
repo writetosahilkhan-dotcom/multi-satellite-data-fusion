@@ -34,6 +34,7 @@ export function Dashboard() {
 
   const [show3D, setShow3D] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
+  const [statsResetKey, setStatsResetKey] = useState(0)
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>()
   const [mapZoom, setMapZoom] = useState<number | undefined>()
   const [riskZones, setRiskZones] = useState<
@@ -41,11 +42,31 @@ export function Dashboard() {
   >(DEFAULT_RISK_ZONES)
   const { toast } = useToast()
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ignore if typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      
+      if (e.key === 'd' || e.key === 'D') {
+        setDemoMode(prev => !prev)
+      } else if (e.key === 'v' || e.key === 'V') {
+        setShow3D(prev => !prev)
+      } else if (e.key === 'Escape' && demoMode) {
+        setDemoMode(false)
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [demoMode])
+
   // Zoom map to Kerala when demo mode starts
   useEffect(() => {
     if (demoMode) {
       setMapCenter({ lat: 10.8505, lng: 76.2711 }) // Kerala coordinates
       setMapZoom(7)
+      setStatsResetKey(prev => prev + 1) // Trigger counter animation
     } else {
       setMapCenter(undefined)
       setMapZoom(undefined)
