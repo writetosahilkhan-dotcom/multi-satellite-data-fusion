@@ -1,6 +1,6 @@
-# 🛰️ Unified Satellite Dashboard
+# 🛰️ Multi-Satellite Data Fusion
 
-A comprehensive real-time satellite tracking and environmental monitoring platform that combines the best features from three separate projects into one powerful unified system.
+A comprehensive real-time satellite tracking and environmental monitoring platform that combines the best features from three separate projects into one powerful multi-satellite data fusion system.
 
 ![Version](https://img.shields.io/badge/version-3.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.9+-green)
@@ -55,7 +55,7 @@ A comprehensive real-time satellite tracking and environmental monitoring platfo
 ## 🏗️ Architecture
 
 ```
-unified-satellite-dashboard/
+multi-satellite-data-fusion/
 ├── backend/              # Python FastAPI server
 │   ├── main.py          # Main API application
 │   ├── services/        # Business logic modules
@@ -101,7 +101,7 @@ unified-satellite-dashboard/
 
 #### 1. Clone or Navigate to Project
 ```bash
-cd unified-satellite-dashboard
+cd multi-satellite-data-fusion
 ```
 
 #### 2. Setup Backend
