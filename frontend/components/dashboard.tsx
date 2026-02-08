@@ -17,7 +17,6 @@ import { KERALA_FLOOD_SCENARIO, type ScenarioStep } from "@/lib/demo-scenarios"
 import { playSound } from "@/lib/sound-effects"
 
 export function Dashboard() {
-  const [hasPlayedStartupSound, setHasPlayedStartupSound] = useState(false)
   const {
     satellites,
     positions,
@@ -77,7 +76,7 @@ export function Dashboard() {
 
   // Play Jadu sound when loading completes
   useEffect(() => {
-    if (!isLoading && !hasPlayedStartupSound) {
+    if (!isLoading) {
       console.log('Loading complete, attempting to play sound...')
       const timer = setTimeout(() => {
         const audio = new Audio('/jadu-sound.mp3')
@@ -94,7 +93,6 @@ export function Dashboard() {
         audio.play()
           .then(() => {
             console.log('Audio playing successfully')
-            setHasPlayedStartupSound(true)
           })
           .catch(err => {
             console.error('Audio play error:', err)
@@ -103,7 +101,6 @@ export function Dashboard() {
               audio.play()
                 .then(() => {
                   console.log('Audio played after user interaction')
-                  setHasPlayedStartupSound(true)
                   document.removeEventListener('click', playOnClick)
                 })
                 .catch(e => console.error('Still failed:', e))
@@ -114,7 +111,7 @@ export function Dashboard() {
       
       return () => clearTimeout(timer)
     }
-  }, [isLoading, hasPlayedStartupSound])
+  }, [isLoading])
 
   // Handle demo scenario steps
   const handleDemoStep = (step: ScenarioStep) => {
