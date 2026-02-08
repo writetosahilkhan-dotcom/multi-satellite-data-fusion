@@ -78,7 +78,6 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Health check endpoint
 @app.get("/health")
-@lru_cache(maxsize=1)
 async def health_check():
     """Health check endpoint for frontend connectivity"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}

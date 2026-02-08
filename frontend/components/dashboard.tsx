@@ -122,11 +122,11 @@ export function Dashboard() {
         setRiskZones(newZones)
       }
     } catch (err) {
-      console.error(\"Demo step error:\", err)
+      console.error("Demo step error:", err)
       toast({
-        title: \"Demo Error\",
-        description: \"Failed to process demo step\",
-        variant: \"destructive\",
+        title: "Demo Error",
+        description: "Failed to process demo step",
+        variant: "destructive",
       })
     }
   }
