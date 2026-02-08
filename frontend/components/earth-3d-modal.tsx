@@ -43,7 +43,7 @@ export function Earth3DModal({ open, onClose, satellites }: Earth3DModalProps) {
   const cy = 240
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/98" role="dialog" aria-modal="true" aria-label="3D Orbital View">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/98" role="dialog" aria-modal="true" aria-label="3D Orbital View">
       {/* Header */}
       <div className="absolute left-5 top-4 flex items-center gap-3">
         <div className="flex h-7 w-7 items-center justify-center rounded bg-primary/15">
