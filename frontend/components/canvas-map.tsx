@@ -194,6 +194,17 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
         ctx.setLineDash([])
       }
 
+      // Label collision detection helper
+      const drawnLabels: { x: number; y: number; w: number; h: number }[] = []
+      const canDrawLabel = (x: number, y: number, w: number, h: number): boolean => {
+        return !drawnLabels.some(label => 
+          x < label.x + label.w + 10 &&
+          x + w + 10 > label.x &&
+          y - h < label.y + 5 &&
+          y + 5 > label.y - label.h
+        )
+      }
+
       // Ground stations
       for (const station of INDIAN_GROUND_STATIONS) {
         const [sx, sy] = project(station.lng, station.lat, w, h)
@@ -226,24 +237,38 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
         ctx.globalAlpha = 1
 
         // Label
-        ctx.fillStyle = color + "90"
         ctx.font = `${Math.max(8, w * 0.007)}px monospace`
-        ctx.fillText(station.name, sx + ms + 6, sy + 3)
+        const labelWidth = ctx.measureText(station.name).width
+        const labelX = sx + ms + 6
+        const labelY = sy + 3
+        
+        if (canDrawLabel(labelX, labelY - 10, labelWidth, 10)) {
+          ctx.fillStyle = color + "90"
+          ctx.fillText(station.name, labelX, labelY)
+          drawnLabels.push({ x: labelX, y: labelY - 10, w: labelWidth, h: 10 })
+        }
       }
 
       // Indian city labels
-      ctx.fillStyle = "#475569"
       ctx.font = `${Math.max(8, w * 0.007)}px monospace`
       for (const city of INDIAN_CITIES) {
         const [cx2, cy2] = project(city.lng, city.lat, w, h)
+        const labelWidth = ctx.measureText(city.name).width
+        const labelX = cx2 + 5
+        const labelY = cy2 + 3
+        
         // Small dot
         ctx.beginPath()
         ctx.arc(cx2, cy2, 1.5, 0, Math.PI * 2)
         ctx.fillStyle = "#334155"
         ctx.fill()
-        // Label
-        ctx.fillStyle = "#475569"
-        ctx.fillText(city.name, cx2 + 5, cy2 + 3)
+        
+        // Label only if no collision
+        if (canDrawLabel(labelX, labelY - 10, labelWidth, 10)) {
+          ctx.fillStyle = "#475569"
+          ctx.fillText(city.name, labelX, labelY)
+          drawnLabels.push({ x: labelX, y: labelY - 10, w: labelWidth, h: 10 })
+        }
       }
 
       // Risk zones
