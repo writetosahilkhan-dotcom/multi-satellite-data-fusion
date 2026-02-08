@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Globe, Clock, Signal, Activity, Play } from "lucide-react"
+import { Globe, Clock, Signal, Activity, Play, PanelRightClose, PanelRightOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSatellites } from "@/hooks/use-satellites"
 import { DEFAULT_RISK_ZONES } from "@/lib/satellite-data"
@@ -35,6 +35,7 @@ export function Dashboard() {
   const [show3D, setShow3D] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
   const [statsResetKey, setStatsResetKey] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>()
   const [mapZoom, setMapZoom] = useState<number | undefined>()
   const [riskZones, setRiskZones] = useState<
@@ -221,6 +222,15 @@ export function Dashboard() {
             <Globe className="h-3.5 w-3.5 text-primary" />
             3D View
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 border-border bg-transparent px-3 text-xs text-foreground hover:bg-secondary"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
+            {sidebarOpen ? 'Hide' : 'Show'} Panel
+          </Button>
         </div>
       </header>
 
@@ -245,16 +255,18 @@ export function Dashboard() {
           mapZoom={mapZoom}
           statsResetKey={statsResetKey}
         />
-        <DetailPanel
-          satellite={selected}
-          position={selected ? positions[selected.id] : undefined}
-          onRiskZonesChange={setRiskZones}
-          satellites={satellites}
-          fusionSelectedIds={fusionSelectedIds}
-          toggleFusionSelect={toggleFusionSelect}
-          fusionSatellites={fusionSatellites}
-          positions={positions}
-        />
+        {sidebarOpen && (
+          <DetailPanel
+            satellite={selected}
+            position={selected ? positions[selected.id] : undefined}
+            onRiskZonesChange={setRiskZones}
+            satellites={satellites}
+            fusionSelectedIds={fusionSelectedIds}
+            toggleFusionSelect={toggleFusionSelect}
+            fusionSatellites={fusionSatellites}
+            positions={positions}
+          />
+        )}
       </div>
 
       <Earth3DModal
