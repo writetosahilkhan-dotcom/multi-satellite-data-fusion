@@ -314,7 +314,7 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
       }
 
       // Satellite markers
-      const now = Date.now()
+      const timestamp = Date.now()
       for (const sat of satellites) {
         const pos = positions[sat.id]
         if (!pos) continue
@@ -323,7 +323,7 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
         const ms = isSelected ? 5 : 3.5
 
         if (isSelected) {
-          const pulse = (Math.sin(now / 400) + 1) / 2
+          const pulse = (Math.sin(timestamp / 400) + 1) / 2
           ctx.beginPath()
           ctx.arc(sx, sy, ms + 6 + pulse * 10, 0, Math.PI * 2)
           ctx.strokeStyle = sat.color
