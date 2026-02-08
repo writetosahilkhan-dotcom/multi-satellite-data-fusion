@@ -42,18 +42,23 @@ export function DemoPlayer({ scenario, onClose, onStepChange }: DemoPlayerProps)
 
   // Trigger steps at correct times
   useEffect(() => {
-    const currentStep = scenario.steps.find(
-      (step, index) =>
-        step.time <= currentTime &&
-        (index === scenario.steps.length - 1 || scenario.steps[index + 1].time > currentTime)
-    )
+    try {
+      const currentStep = scenario.steps.find(
+        (step, index) =>
+          step.time <= currentTime &&
+          (index === scenario.steps.length - 1 || scenario.steps[index + 1].time > currentTime)
+      )
 
-    if (currentStep) {
-      const stepIndex = scenario.steps.indexOf(currentStep)
-      if (stepIndex !== currentStepIndex) {
-        setCurrentStepIndex(stepIndex)
-        onStepChange(currentStep)
+      if (currentStep) {
+        const stepIndex = scenario.steps.indexOf(currentStep)
+        if (stepIndex !== currentStepIndex) {
+          setCurrentStepIndex(stepIndex)
+          onStepChange(currentStep)
+        }
       }
+    } catch (err) {
+      console.error("Demo step error:", err)
+      setIsPlaying(false)
     }
   }, [currentTime, scenario.steps, currentStepIndex, onStepChange])
 

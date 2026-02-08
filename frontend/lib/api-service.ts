@@ -33,11 +33,17 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<{ data:
       
       clearTimeout(timeoutId)
       
-      if (!res.ok) throw new Error(`API ${res.status}`)
+      if (!res.ok) {
+        console.warn(`API error ${res.status} for ${path}`)
+        throw new Error(`API ${res.status}`)
+      }
       const data = await res.json()
       return { data, source: "api" as const }
-    } catch {
-      // Backend unavailable - return null to trigger fallback
+    } catch (err) {
+      // Log error details for debugging
+      if (err instanceof Error && err.name !== "AbortError") {
+        console.warn(`Backend request failed: ${path}`, err.message)
+      }
       throw new Error("Backend unavailable")
     }
   })()

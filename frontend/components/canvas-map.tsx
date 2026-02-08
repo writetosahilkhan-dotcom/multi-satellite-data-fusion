@@ -6,8 +6,7 @@ import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Satellite, SatellitePosition } from "@/lib/satellite-types"
 import { CONTINENT_POLYGONS, MAJOR_LAKES } from "@/lib/world-geo"
-import { INDIAN_GROUND_STATIONS, INDIAN_CITIES } from "@/lib/satellite-data"
-
+import { INDIAN_GROUND_STATIONS, INDIAN_CITIES } from "@/lib/satellite-data"import { perfMonitor } from \"@/lib/performance-monitor\"
 interface CanvasMapProps {
   satellites: Satellite[]
   positions: Record<string, SatellitePosition>
@@ -109,6 +108,8 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
     function draw() {
       if (!ctx) return
       
+      const endMeasure = perfMonitor.startMeasure('canvas-render')
+      
       // Throttle to 30 FPS for better performance
       const now = performance.now()
       if (now - lastDrawTime.current < 33) {
@@ -117,10 +118,11 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
       }
       lastDrawTime.current = now
       
-      const w = dims.width
-      const h = dims.height
-      ctx.save()
-      ctx.clearRect(0, 0, w, h)
+      try {
+        const w = dims.width
+        const h = dims.height
+        ctx.save()
+        ctx.clearRect(0, 0, w, h)
 
       const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.7)
       bgGrad.addColorStop(0, COLORS.bg)
@@ -376,8 +378,14 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
       }
 
       ctx.restore()
+      endMeasure()
       animFrameRef.current = requestAnimationFrame(draw)
+    } catch (err) {
+      console.error(\"Canvas render error:\", err)
+      ctx.restore()
+      endMeasure()
     }
+  }
 
     draw()
     return () => cancelAnimationFrame(animFrameRef.current)

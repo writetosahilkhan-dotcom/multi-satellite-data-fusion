@@ -75,44 +75,59 @@ export function Dashboard() {
 
   // Handle demo scenario steps
   const handleDemoStep = (step: ScenarioStep) => {
-    // Play appropriate sound
-    if (step.data?.type === 'danger' || step.data?.severity === 'critical') {
-      playSound.critical()
-    } else if (step.data?.type === 'warning' || step.data?.severity === 'medium') {
-      playSound.warning()
-    } else {
-      playSound.info()
-    }
+    try {
+      // Validate step data
+      if (!step || !step.title) {
+        console.warn(\"Invalid demo step received\", step)
+        return
+      }
 
-    // Check if this is the final step - play success sound for mission completion
-    if (step.time >= KERALA_FLOOD_SCENARIO.duration - 5) {
-      setTimeout(() => {
-        playSound.success() // Subtle success tone instead of celebration
-      }, 1000)
-    }
+      // Play appropriate sound
+      if (step.data?.type === 'danger' || step.data?.severity === 'critical') {
+        playSound.critical()
+      } else if (step.data?.type === 'warning' || step.data?.severity === 'medium') {
+        playSound.warning()
+      } else {
+        playSound.info()
+      }
 
-    // Show toast notification for each step
-    const messageData = step.data?.message || step.title
-    const toastVariant = 
-      step.data?.type === 'danger' || step.data?.severity === 'critical' ? 'destructive' :
-      step.data?.type === 'warning' || step.data?.severity === 'medium' ? 'default' :
-      'default'
+      // Check if this is the final step - play success sound for mission completion
+      if (step.time >= KERALA_FLOOD_SCENARIO.duration - 5) {
+        setTimeout(() => {
+          playSound.success() // Subtle success tone instead of celebration
+        }, 1000)
+      }
 
-    toast({
-      title: step.title,
-      description: messageData,
-      variant: toastVariant as any,
-    })
+      // Show toast notification for each step
+      const messageData = step.data?.message || step.title
+      const toastVariant = 
+        step.data?.type === 'danger' || step.data?.severity === 'critical' ? 'destructive' :
+        step.data?.type === 'warning' || step.data?.severity === 'medium' ? 'default' :
+        'default'
 
-    // Update risk zones based on step
-    if (step.action === 'risk_increase' && step.data?.zones) {
-      const newZones = Array.from({ length: step.data.zones }, (_, i) => ({
-        lat: KERALA_FLOOD_SCENARIO.location.lat + (Math.random() - 0.5) * 2,
-        lng: KERALA_FLOOD_SCENARIO.location.lng + (Math.random() - 0.5) * 2,
-        radius: 20 + Math.random() * 30,
-        severity: step.data.riskLevel || 'high'
-      }))
-      setRiskZones(newZones)
+      toast({
+        title: step.title,
+        description: messageData,
+        variant: toastVariant as any,
+      })
+
+      // Update risk zones based on step
+      if (step.action === 'risk_increase' && step.data?.zones) {
+        const newZones = Array.from({ length: step.data.zones }, (_, i) => ({
+          lat: KERALA_FLOOD_SCENARIO.location.lat + (Math.random() - 0.5) * 2,
+          lng: KERALA_FLOOD_SCENARIO.location.lng + (Math.random() - 0.5) * 2,
+          radius: 20 + Math.random() * 30,
+          severity: step.data.riskLevel || 'high'
+        }))
+        setRiskZones(newZones)
+      }
+    } catch (err) {
+      console.error(\"Demo step error:\", err)
+      toast({
+        title: \"Demo Error\",
+        description: \"Failed to process demo step\",
+        variant: \"destructive\",
+      })
     }
   }
 

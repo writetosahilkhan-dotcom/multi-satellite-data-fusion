@@ -17,47 +17,54 @@ export function useSatellites() {
 
   // Check backend health on mount
   useEffect(() => {
-    checkBackendHealth().then((ok) => setBackendStatus(ok ? "online" : "offline"))
-    const interval = setInterval(async () => {
-      const ok = await checkBackendHealth()
-      setBackendStatus(ok ? "online" : "offline")
-    }, 30000)
+    const checkHealth = async () => {
+      try {
+        const ok = await checkBackendHealth()
+        setBackendStatus(ok ? "online" : "offline")
+      } catch (err) {
+        console.warn("Backend health check failed:", err)
+        setBackendStatus("offline")
+      }
+    }
+    checkHealth()
+    const interval = setInterval(checkHealth, 30000)
     return () => clearInterval(interval)
   }, [])
 
   // Update positions every second
   useEffect(() => {
     const update = () => {
-      const now = Date.now()
-      const newPositions: Record<string, SatellitePosition> = {}
-      let hasChanges = false
-      
-      for (const sat of satellites) {
-        const pos = calculatePosition(
-          now,
-          sat.orbitOffset,
-          sat.altitude,
-          sat.geostationary,
-          sat.fixedLng
-        )
-        newPositions[sat.id] = pos
+      try {
+        const now = Date.now()
+        const newPositions: Record<string, SatellitePosition> = {}
+        let hasChanges = false
         
-        // Check if position changed significantly (>0.01 degrees)
-        const oldPos = positions[sat.id]
-        if (!oldPos || 
-            Math.abs(oldPos.lat - pos.lat) > 0.01 || 
-            Math.abs(oldPos.lng - pos.lng) > 0.01) {
-          hasChanges = true
+        for (const sat of satellites) {
+          const pos = calculatePosition(
+            now,
+            sat.orbitOffset,
+            sat.altitude,
+            sat.geostationary,
+            sat.fixedLng
+          )
+          newPositions[sat.id] = pos
+          
+          // Check if position changed significantly (>0.01 degrees)
+          const oldPos = positions[sat.id]
+          if (!oldPos || 
+              Math.abs(oldPos.lat - pos.lat) > 0.01 || 
+              Math.abs(oldPos.lng - pos.lng) > 0.01) {
+            hasChanges = true
+          }
         }
-      }
-      
-      if (hasChanges) {
-        setPositions(newPositions)
-      }
-      
-      // Mark as loaded after first update
-      if (isLoading) {
-        setIsLoading(false)
+        
+        if (hasChanges || isLoading) {
+          setPositions(newPositions)
+          if (isLoading) setIsLoading(false)
+        }
+      } catch (err) {
+        console.error("Position update error:", err)
+        if (isLoading) setIsLoading(false)
       }
     }
     update()
