@@ -35,10 +35,23 @@ export function Dashboard() {
   const [show3D, setShow3D] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>()
+  const [mapZoom, setMapZoom] = useState<number | undefined>()
   const [riskZones, setRiskZones] = useState<
     { lat: number; lng: number; radius: number; severity: string }[]
   >(DEFAULT_RISK_ZONES)
   const { toast } = useToast()
+
+  // Zoom map to Kerala when demo mode starts
+  useEffect(() => {
+    if (demoMode) {
+      setMapCenter({ lat: 10.8505, lng: 76.2711 }) // Kerala coordinates
+      setMapZoom(7)
+    } else {
+      setMapCenter(undefined)
+      setMapZoom(undefined)
+    }
+  }, [demoMode])
 
   // Handle demo scenario steps
   const handleDemoStep = (step: ScenarioStep) => {

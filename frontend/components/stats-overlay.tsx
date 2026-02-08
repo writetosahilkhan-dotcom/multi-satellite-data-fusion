@@ -68,7 +68,11 @@ function StatCard({ icon, value, label, trend, variant = "default", animate = fa
   )
 }
 
-export function StatsOverlay() {
+interface StatsOverlayProps {
+  resetKey?: number
+}
+
+export function StatsOverlay({ resetKey = 0 }: StatsOverlayProps) {
   return (
     <div className="absolute left-3 top-14 z-[1000] w-[220px]">
       <div className="rounded-lg border border-border bg-card/95 p-3 shadow-lg backdrop-blur-sm">
@@ -84,6 +88,7 @@ export function StatsOverlay() {
             label="Satellites"
             variant="default"
             animate
+            key={`sat-${resetKey}`}
           />
           <StatCard
             icon={<AlertTriangle className="h-3.5 w-3.5" />}
@@ -91,6 +96,7 @@ export function StatsOverlay() {
             label="Active Alerts"
             variant="warning"
             animate
+            key={`alert-${resetKey}`}
           />
           <StatCard
             icon={<Users className="h-3.5 w-3.5" />}
@@ -99,6 +105,7 @@ export function StatsOverlay() {
             trend="+15%"
             variant="success"
             animate
+            key={`users-${resetKey}`}
           />
           <StatCard
             icon={<MapPin className="h-3.5 w-3.5" />}
@@ -106,6 +113,7 @@ export function StatsOverlay() {
             label="Regions"
             variant="default"
             animate
+            key={`regions-${resetKey}`}
           />
         </div>
 

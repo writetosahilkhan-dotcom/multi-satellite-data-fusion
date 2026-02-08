@@ -10,6 +10,8 @@ interface LeafletMapProps {
   selectedId: string
   onSelect: (id: string) => void
   riskZones?: { lat: number; lng: number; radius: number; severity: string }[]
+  mapCenter?: { lat: number; lng: number }
+  mapZoom?: number
 }
 
 let L: typeof import("leaflet") | null = null
@@ -26,7 +28,7 @@ function throttle<T extends (...args: any[]) => any>(func: T, limit: number): T 
   } as T
 }
 
-export function LeafletMap({ satellites, positions, selectedId, onSelect, riskZones = [] }: LeafletMapProps) {
+export function LeafletMap({ satellites, positions, selectedId, onSelect, riskZones = [], mapCenter, mapZoom }: LeafletMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Record<string, L.Marker>>({})
@@ -168,6 +170,17 @@ export function LeafletMap({ satellites, positions, selectedId, onSelect, riskZo
       riskCirclesRef.current.push(c)
     }
   }, [riskZones])
+
+  // Update map center and zoom when props change
+  useEffect(() => {
+    if (!mapRef.current || !L) return
+    if (mapCenter && mapZoom) {
+      mapRef.current.flyTo([mapCenter.lat, mapCenter.lng], mapZoom, {
+        duration: 2,
+        easeLinearity: 0.25
+      })
+    }
+  }, [mapCenter, mapZoom])
 
   // Update GEO footprints
   useEffect(() => {
