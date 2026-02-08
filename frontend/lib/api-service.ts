@@ -1,9 +1,9 @@
 /**
  * API service layer for Multi-Satellite Data Fusion Dashboard
- * Attempts to call the backend at localhost:8000, falls back to local simulation
+ * Attempts to call the backend, falls back to local simulation
  */
 
-const API_BASE = "http://localhost:8000"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // Request cache for deduplication
 const requestCache = new Map<string, { promise: Promise<any>; timestamp: number }>()
