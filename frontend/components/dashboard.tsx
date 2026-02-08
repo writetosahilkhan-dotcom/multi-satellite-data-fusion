@@ -226,6 +226,9 @@ export function Dashboard() {
           selectedId={selectedId}
           onSelect={setSelectedId}
           riskZones={riskZones}
+          mapCenter={mapCenter}
+          mapZoom={mapZoom}
+          statsResetKey={statsResetKey}
         />
         <DetailPanel
           satellite={selected}

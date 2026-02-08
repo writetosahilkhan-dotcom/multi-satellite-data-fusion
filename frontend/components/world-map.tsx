@@ -15,15 +15,16 @@ interface WorldMapProps {
   riskZones?: { lat: number; lng: number; radius: number; severity: string }[]
   mapCenter?: { lat: number; lng: number }
   mapZoom?: number
+  statsResetKey?: number
 }
 
-export function WorldMap({ satellites, positions, selectedId, onSelect, riskZones = [], mapCenter, mapZoom }: WorldMapProps) {
+export function WorldMap({ satellites, positions, selectedId, onSelect, riskZones = [], mapCenter, mapZoom, statsResetKey }: WorldMapProps) {
   const [mode, setMode] = useState<"satellite" | "tactical">("satellite")
 
   return (
     <div className="relative h-full flex-1 overflow-hidden bg-background">
       {/* Stats Overlay */}
-      <StatsOverlay resetKey={mapZoom} />
+      <StatsOverlay resetKey={statsResetKey} />
 
       {/* Map mode toggle */}
       <div className="absolute top-3 right-3 z-[1000] flex items-center gap-0.5 rounded-md border border-border bg-card/90 p-0.5 backdrop-blur-sm">
