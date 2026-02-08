@@ -5,6 +5,7 @@ import { Map, Grid3x3 } from "lucide-react"
 import type { Satellite, SatellitePosition } from "@/lib/satellite-types"
 import { LeafletMap } from "@/components/leaflet-map"
 import { CanvasMap } from "@/components/canvas-map"
+import { StatsOverlay } from "@/components/stats-overlay"
 
 interface WorldMapProps {
   satellites: Satellite[]
@@ -19,8 +20,11 @@ export function WorldMap({ satellites, positions, selectedId, onSelect, riskZone
 
   return (
     <div className="relative h-full flex-1 overflow-hidden bg-background">
+      {/* Stats Overlay */}
+      <StatsOverlay />
+
       {/* Map mode toggle */}
-      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-0.5 rounded-md border border-border bg-card/90 p-0.5 backdrop-blur-sm">
+      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-0.5 rounded-md border border-border bg-card/90 p-0.5 backdrop-blur-sm">
         <button
           onClick={() => setMode("satellite")}
           className={`flex items-center gap-1.5 rounded px-2.5 py-1 font-mono text-[10px] transition-colors ${

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Globe, Clock, Signal, Activity } from "lucide-react"
+import { Globe, Clock, Signal, Activity, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSatellites } from "@/hooks/use-satellites"
 import { DEFAULT_RISK_ZONES } from "@/lib/satellite-data"
@@ -9,8 +9,11 @@ import { SatelliteSidebar } from "@/components/satellite-sidebar"
 import { WorldMap } from "@/components/world-map"
 import { DetailPanel } from "@/components/detail-panel"
 import { Earth3DModal } from "@/components/earth-3d-modal"
+import { DemoPlayer } from "@/components/demo-player"
 import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/hooks/use-toast"
 import { memo } from "react"
+import { KERALA_FLOOD_SCENARIO, type ScenarioStep } from "@/lib/demo-scenarios"
 
 export function Dashboard() {
   const {
@@ -28,9 +31,38 @@ export function Dashboard() {
   } = useSatellites()
 
   const [show3D, setShow3D] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
   const [riskZones, setRiskZones] = useState<
     { lat: number; lng: number; radius: number; severity: string }[]
   >(DEFAULT_RISK_ZONES)
+  const { toast } = useToast()
+
+  // Handle demo scenario steps
+  const handleDemoStep = (step: ScenarioStep) => {
+    // Show toast notification for each step
+    const messageData = step.data?.message || step.title
+    const toastVariant = 
+      step.data?.type === 'danger' || step.data?.severity === 'critical' ? 'destructive' :
+      step.data?.type === 'warning' || step.data?.severity === 'medium' ? 'default' :
+      'default'
+
+    toast({
+      title: step.title,
+      description: messageData,
+      variant: toastVariant as any,
+    })
+
+    // Update risk zones based on step
+    if (step.action === 'risk_increase' && step.data?.zones) {
+      const newZones = Array.from({ length: step.data.zones }, (_, i) => ({
+        lat: KERALA_FLOOD_SCENARIO.location.lat + (Math.random() - 0.5) * 2,
+        lng: KERALA_FLOOD_SCENARIO.location.lng + (Math.random() - 0.5) * 2,
+        radius: 20 + Math.random() * 30,
+        severity: step.data.riskLevel || 'high'
+      }))
+      setRiskZones(newZones)
+    }
+  }
 
   return (
     <div className="flex h-screen w-screen flex-col bg-background">
@@ -74,15 +106,26 @@ export function Dashboard() {
             </span>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-7 gap-1.5 border-border bg-transparent px-3 text-xs text-foreground hover:bg-secondary"
-          onClick={() => setShow3D(true)}
-        >
-          <Globe className="h-3.5 w-3.5 text-primary" />
-          3D View
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 border-primary/30 bg-primary/10 px-3 text-xs text-primary hover:bg-primary/20"
+            onClick={() => setDemoMode(true)}
+          >
+            <Play className="h-3.5 w-3.5" />
+            Demo Mode
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 border-border bg-transparent px-3 text-xs text-foreground hover:bg-secondary"
+            onClick={() => setShow3D(true)}
+          >
+            <Globe className="h-3.5 w-3.5 text-primary" />
+            3D View
+          </Button>
+        </div>
       </header>
 
       {/* Main layout */}
@@ -120,6 +163,19 @@ export function Dashboard() {
         onClose={() => setShow3D(false)}
         satellites={satellites}
       />
+
+      {/* Demo Mode Player */}
+      {demoMode && (
+        <DemoPlayer
+          scenario={KERALA_FLOOD_SCENARIO}
+          onClose={() => {
+            setDemoMode(false)
+            setRiskZones(DEFAULT_RISK_ZONES)
+          }}
+          onStepChange={handleDemoStep}
+        />
+      )}
+
       <Toaster />
     </div>
   )
