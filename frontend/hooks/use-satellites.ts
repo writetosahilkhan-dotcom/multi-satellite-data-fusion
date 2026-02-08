@@ -13,7 +13,16 @@ export function useSatellites() {
   )
   const [positions, setPositions] = useState<Record<string, SatellitePosition>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [minLoadingTime, setMinLoadingTime] = useState(true)
   const [backendStatus, setBackendStatus] = useState<"checking" | "online" | "offline">("checking")
+
+  // Enforce minimum loading time of 2 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingTime(false)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Check backend health on mount
   useEffect(() => {
@@ -60,11 +69,17 @@ export function useSatellites() {
         
         if (hasChanges || isLoading) {
           setPositions(newPositions)
-          if (isLoading) setIsLoading(false)
+          // Only complete loading if minimum time has elapsed
+          if (isLoading && !minLoadingTime) {
+            setIsLoading(false)
+          }
         }
       } catch (err) {
         console.error("Position update error:", err)
-        if (isLoading) setIsLoading(false)
+        // Only complete loading if minimum time has elapsed
+        if (isLoading && !minLoadingTime) {
+          setIsLoading(false)
+        }
       }
     }
     update()

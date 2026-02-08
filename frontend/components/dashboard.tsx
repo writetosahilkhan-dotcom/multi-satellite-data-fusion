@@ -17,6 +17,7 @@ import { KERALA_FLOOD_SCENARIO, type ScenarioStep } from "@/lib/demo-scenarios"
 import { playSound } from "@/lib/sound-effects"
 
 export function Dashboard() {
+  const [hasPlayedStartupSound, setHasPlayedStartupSound] = useState(false)
   const {
     satellites,
     positions,
@@ -73,6 +74,47 @@ export function Dashboard() {
       setMapZoom(undefined)
     }
   }, [demoMode])
+
+  // Play Jadu sound when loading completes
+  useEffect(() => {
+    if (!isLoading && !hasPlayedStartupSound) {
+      console.log('Loading complete, attempting to play sound...')
+      const timer = setTimeout(() => {
+        const audio = new Audio('/jadu-sound.mp3')
+        audio.volume = 0.7
+        
+        // Add event listeners for debugging
+        audio.addEventListener('loadeddata', () => {
+          console.log('Audio loaded successfully')
+        })
+        audio.addEventListener('error', (e) => {
+          console.error('Audio load error:', e)
+        })
+        
+        audio.play()
+          .then(() => {
+            console.log('Audio playing successfully')
+            setHasPlayedStartupSound(true)
+          })
+          .catch(err => {
+            console.error('Audio play error:', err)
+            // Try playing on user interaction
+            const playOnClick = () => {
+              audio.play()
+                .then(() => {
+                  console.log('Audio played after user interaction')
+                  setHasPlayedStartupSound(true)
+                  document.removeEventListener('click', playOnClick)
+                })
+                .catch(e => console.error('Still failed:', e))
+            }
+            document.addEventListener('click', playOnClick, { once: true })
+          })
+      }, 300)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, hasPlayedStartupSound])
 
   // Handle demo scenario steps
   const handleDemoStep = (step: ScenarioStep) => {
@@ -132,7 +174,7 @@ export function Dashboard() {
     }
   }
 
-  // Show loading indicator
+  // Show loading indicator with extended duration
   if (isLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background">
