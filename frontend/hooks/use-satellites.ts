@@ -12,6 +12,7 @@ export function useSatellites() {
     () => new Set(DEFAULT_SATELLITES.map((s) => s.id))
   )
   const [positions, setPositions] = useState<Record<string, SatellitePosition>>({})
+  const [isLoading, setIsLoading] = useState(true)
   const [backendStatus, setBackendStatus] = useState<"checking" | "online" | "offline">("checking")
 
   // Check backend health on mount
@@ -53,11 +54,16 @@ export function useSatellites() {
       if (hasChanges) {
         setPositions(newPositions)
       }
+      
+      // Mark as loaded after first update
+      if (isLoading) {
+        setIsLoading(false)
+      }
     }
     update()
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
-  }, [satellites, positions])
+  }, [satellites, positions, isLoading])
 
   const addSatellite = useCallback((name: string, noradId: string) => {
     const colors = ["#EC4899", "#8B5CF6", "#F97316", "#14B8A6", "#EF4444"]
@@ -130,5 +136,6 @@ export function useSatellites() {
     toggleFusionSelect,
     fusionSatellites,
     backendStatus,
+    isLoading,
   }
 }

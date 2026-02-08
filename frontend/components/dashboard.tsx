@@ -29,6 +29,7 @@ export function Dashboard() {
     toggleFusionSelect,
     fusionSatellites,
     backendStatus,
+    isLoading,
   } = useSatellites()
 
   const [show3D, setShow3D] = useState(false)
@@ -94,6 +95,21 @@ export function Dashboard() {
     }
   }
 
+  // Show loading indicator
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+          <div className="text-center">
+            <p className="text-sm font-medium text-foreground">Initializing Satellite Network</p>
+            <p className="text-xs text-muted-foreground">Calculating orbital positions...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen w-screen flex-col bg-background">
       {/* Top command bar */}
@@ -108,6 +124,20 @@ export function Dashboard() {
             </span>
             <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium text-primary">
               FUSION
+            </span>
+          </div>
+          
+          {/* Backend Status */}
+          <div className="flex items-center gap-1.5">
+            <div className={`h-1.5 w-1.5 rounded-full ${
+              backendStatus === 'online' ? 'bg-emerald-500 animate-pulse' : 
+              backendStatus === 'offline' ? 'bg-red-500' : 
+              'bg-amber-500 animate-pulse'
+            }`} />
+            <span className="text-[10px] text-muted-foreground">
+              {backendStatus === 'online' ? 'API Connected' : 
+               backendStatus === 'offline' ? 'API Offline' : 
+               'Checking...'}
             </span>
           </div>
           <div className="h-4 w-px bg-border" />

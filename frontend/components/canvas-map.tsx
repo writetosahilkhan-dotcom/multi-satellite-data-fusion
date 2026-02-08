@@ -45,6 +45,7 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
   const trailsRef = useRef<Record<string, { x: number; y: number }[]>>({})
   const dprRef = useRef(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1)
   const animFrameRef = useRef<number>(0)
+  const lastDrawTime = useRef(0)
 
   useEffect(() => {
     const el = containerRef.current
@@ -107,6 +108,15 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
 
     function draw() {
       if (!ctx) return
+      
+      // Throttle to 30 FPS for better performance
+      const now = performance.now()
+      if (now - lastDrawTime.current < 33) {
+        animFrameRef.current = requestAnimationFrame(draw)
+        return
+      }
+      lastDrawTime.current = now
+      
       const w = dims.width
       const h = dims.height
       ctx.save()
