@@ -6,7 +6,9 @@ import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Satellite, SatellitePosition } from "@/lib/satellite-types"
 import { CONTINENT_POLYGONS, MAJOR_LAKES } from "@/lib/world-geo"
-import { INDIAN_GROUND_STATIONS, INDIAN_CITIES } from "@/lib/satellite-data"import { perfMonitor } from \"@/lib/performance-monitor\"
+import { INDIAN_GROUND_STATIONS, INDIAN_CITIES } from "@/lib/satellite-data"
+import { perfMonitor } from "@/lib/performance-monitor"
+
 interface CanvasMapProps {
   satellites: Satellite[]
   positions: Record<string, SatellitePosition>

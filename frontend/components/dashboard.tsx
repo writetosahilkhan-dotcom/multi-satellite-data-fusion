@@ -78,7 +78,7 @@ export function Dashboard() {
     try {
       // Validate step data
       if (!step || !step.title) {
-        console.warn(\"Invalid demo step received\", step)
+        console.warn("Invalid demo step received", step)
         return
       }
 
