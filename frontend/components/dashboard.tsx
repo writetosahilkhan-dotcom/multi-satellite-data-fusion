@@ -10,7 +10,6 @@ import { WorldMap } from "@/components/world-map"
 import { DetailPanel } from "@/components/detail-panel"
 import { Earth3DModal } from "@/components/earth-3d-modal"
 import { DemoPlayer } from "@/components/demo-player"
-import { ConfettiCelebration } from "@/components/celebration-effects"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { memo } from "react"
@@ -34,7 +33,6 @@ export function Dashboard() {
 
   const [show3D, setShow3D] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>()
   const [mapZoom, setMapZoom] = useState<number | undefined>()
   const [riskZones, setRiskZones] = useState<
@@ -64,11 +62,10 @@ export function Dashboard() {
       playSound.info()
     }
 
-    // Check if this is the final step for celebration
+    // Check if this is the final step - play success sound for mission completion
     if (step.time >= KERALA_FLOOD_SCENARIO.duration - 5) {
       setTimeout(() => {
-        playSound.celebration()
-        setShowCelebration(true)
+        playSound.success() // Subtle success tone instead of celebration
       }, 1000)
     }
 
@@ -207,11 +204,7 @@ export function Dashboard() {
             setRiskZones(DEFAULT_RISK_ZONES)
           }}
           onStepChange={handleDemoStep}
-        />
-      )}
-
-      {/* Celebration Effects */}
-      <ConfettiCelebration trigger={showCelebration} duration={4000} />
+        />      )}
 
       <Toaster />
     </div>
