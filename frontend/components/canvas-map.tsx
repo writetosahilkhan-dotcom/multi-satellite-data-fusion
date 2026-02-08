@@ -383,7 +383,7 @@ export function CanvasMap({ satellites, positions, selectedId, onSelect, riskZon
       endMeasure()
       animFrameRef.current = requestAnimationFrame(draw)
     } catch (err) {
-      console.error(\"Canvas render error:\", err)
+      console.error("Canvas render error:", err)
       ctx.restore()
       endMeasure()
     }
