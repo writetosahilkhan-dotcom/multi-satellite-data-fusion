@@ -43,9 +43,20 @@ export function Earth3DModal({ open, onClose, satellites }: Earth3DModalProps) {
   const cy = 240
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/98" role="dialog" aria-modal="true" aria-label="3D Orbital View">
-      {/* Header */}
-      <div className="absolute left-5 top-4 flex items-center gap-3">
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      
+      {/* Modal Content */}
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center" role="dialog" aria-modal="true" aria-label="3D Orbital View">
+        {/* Container with background */}
+        <div className="relative h-[600px] w-[900px] rounded-lg border border-border bg-card/95 shadow-2xl backdrop-blur-sm">
+          {/* Header */}
+          <div className="absolute left-5 top-4 flex items-center gap-3">
         <div className="flex h-7 w-7 items-center justify-center rounded bg-primary/15">
           <div className="h-2 w-2 rounded-full bg-primary" />
         </div>
@@ -224,6 +235,8 @@ export function Earth3DModal({ open, onClose, satellites }: Earth3DModalProps) {
           LIVE ORBITAL TRACKING
         </text>
       </svg>
-    </div>
+        </div>
+      </div>
+    </>
   )
 }
